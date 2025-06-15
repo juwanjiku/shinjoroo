@@ -1,0 +1,66 @@
+# Load required libraries
+library(tidyverse)   # Data manipulation and visualization
+library(lubridate)   # Date handling
+library(zoo)        # Moving averages
+library(forecast)   # Time series forecasting
+library(tseries)    # Stationarity tests
+
+# Load the dataset
+temp_data <- read.csv("C:/Users/NJOROGEJULIA/Downloads/kenya-climate-data-1991-2016-temp-degress-celcius.csv")
+
+# Check for missing values
+sum(is.na(temp_data))  # If any, use na.omit() or imputation
+
+summary(temp_data)
+
+hist(temp_data$Temperature....Celsius.,
+     main = "Histogram of Monthly Average Temperatures (1991–2016)",
+     xlab = "Temperature (°C)",
+     col = "lightblue",
+     border = "black")
+     
+temp_data$Year <- as.numeric(as.character(temp_data$Year))
+# Fit the linear model
+model <- lm(Temperature....Celsius. ~ Year, data = temp_data)
+
+# View summary of the regression
+summary(model)
+ggplot(temp_data, aes(x = Year, y = Temperature....Celsius.)) +
+  geom_point(color = "darkblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Linear Regression: Temperature vs Year",
+       x = "Year",
+       y = "Temperature (°C)") +
+  theme_minimal()
+  temp_data$Year <- as.numeric(as.character(temp_data$Year))
+# Fit the linear model
+model <- lm(Temperature....Celsius. ~ Year, data = temp_data)
+
+# View summary of the regression
+summary(model)
+
+library(tidyverse)
+library(zoo)  # For rolling means
+
+# 12-month moving average
+temp_data$MA12 <- rollmean(temp_data$Temperature....Celsius., k = 12, fill = NA, align = "right")
+
+ggplot(temp_data, aes(x = 1:nrow(temp_data))) +
+  geom_line(aes(y = Temperature....Celsius.), color = "gray60", size = 1, alpha = 0.6) +
+  geom_line(aes(y = MA12), color = "blue", size = 1.2) +
+  labs(title = "Monthly Average Temperature with 12-Month Moving Average",
+       x = "Time (Index)",
+       y = "Temperature (°C)") +
+  theme_minimal()
+  
+table(temp_data$Month)
+
+temp_data$Month <- factor(temp_data$Month)
+length(levels(temp_data$Month))  # Should be ≥ 2
+
+temp_data$Month <- factor(temp_data$Month,
+ levels = 1:12,
+ labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+ 
+ anova_model <- aov(Temperature....Celsius. ~ Month, data = temp_data)
+summary(anova_model)
